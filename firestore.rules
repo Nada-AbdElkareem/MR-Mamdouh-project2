@@ -1,0 +1,119 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helper Functions ---
+    
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'mamdouhyasin19@gmail.com' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || request.auth.token.email == resource.data.email || isAdmin());
+      allow list: if isSignedIn() && (resource.data.email == request.auth.token.email || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    match /modules/{moduleId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /departments/{deptId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Collection Group rule for visits
+    match /{path=**}/visits/{visitId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // Collection Group rule for members
+    match /{path=**}/members/{memberId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /families/{familyId} {
+      allow read, write: if isSignedIn();
+      
+      match /members/{memberId} {
+        allow read, write: if isSignedIn();
+      }
+
+      match /history/{snapshotId} {
+        allow read, write: if isSignedIn();
+      }
+    }
+
+    match /lookups/{lookupId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    match /notifications/{notificationId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /assistances/{assistanceId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /donors/{donorId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /donations/{donationId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /campaigns/{campaignId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    match /services/{serviceId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    match /emergency_cases/{caseId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /medical_claims/{claimId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /aid_requests/{requestId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /store_items/{itemId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /assistance_types/{typeId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /test/connection {
+      allow read: if true;
+    }
+  }
+}

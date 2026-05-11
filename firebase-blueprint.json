@@ -1,0 +1,442 @@
+{
+  "entities": {
+    "Family": {
+      "title": "Family",
+      "description": "Represents a family file in the charity system.",
+      "type": "object",
+      "properties": {
+        "fileNumber": { "type": "string" },
+        "committeeCode": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "address": { "type": "string" },
+        "socialStatus": { "type": "string" },
+        "numberOfDependents": { "type": "number" },
+        "housingStatus": { "type": "string" },
+        "housingCondition": {
+          "type": "object",
+          "properties": {
+            "type": { "type": "string", "enum": ["brick", "adobe", "wood", "other"] },
+            "rooms": { "type": "number" },
+            "hasWater": { "type": "boolean" },
+            "hasElectricity": { "type": "boolean" },
+            "hasFurniture": { "type": "boolean" },
+            "notes": { "type": "string" }
+          }
+        },
+        "expenses": {
+          "type": "object",
+          "properties": {
+            "housing": { "type": "number" },
+            "food": { "type": "number" },
+            "health": { "type": "number" },
+            "education": { "type": "number" },
+            "other": { "type": "number" },
+            "total": { "type": "number" }
+          }
+        },
+        "status": { "type": "string", "enum": ["pending", "active", "suspended", "closed"] },
+        "priority": { "type": "string", "enum": ["low", "medium", "high", "urgent"] },
+        "monthlyIncome": { "type": "number" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "ownerId": { "type": "string" },
+        "isDeleted": { "type": "boolean" }
+      },
+      "required": ["fileNumber", "name", "status"]
+    },
+    "FamilyMember": {
+      "title": "Family Member",
+      "description": "Details of an individual member of a family.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "memberCode": { "type": "string" },
+        "nationalId": { "type": "string" },
+        "birthDate": { "type": "string", "format": "date" },
+        "gender": { "type": "string", "enum": ["male", "female"] },
+        "relation": { "type": "string", "enum": ["husband", "wife", "son", "daughter", "other"] },
+        "nationality": { "type": "string" },
+        "educationLevel": { "type": "string", "enum": ["none", "primary", "preparatory", "secondary", "university"] },
+        "employmentStatus": { "type": "string" },
+        "healthCondition": { "type": "string" },
+        "disease": { "type": "string" },
+        "diseaseDetails": { "type": "string" },
+        "monthlyIncome": { "type": "number" },
+        "isHealthy": { "type": "boolean" },
+        "familyId": { "type": "string" },
+        "aidRequests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "type": { "type": "string" },
+              "quantity": { "type": "number" },
+              "unitCost": { "type": "number" },
+              "totalCost": { "type": "number" },
+              "status": { "type": "string", "enum": ["requested", "confirmed", "rejected", "delivered"] },
+              "requestDate": { "type": "string", "format": "date" },
+              "processedDate": { "type": "string", "format": "date" },
+              "deliveryDate": { "type": "string", "format": "date" },
+              "deliveryDetails": { "type": "string" },
+              "rejectionReason": { "type": "string" },
+              "illnessDetails": { "type": "string" },
+              "needDetails": { "type": "string" },
+              "notes": { "type": "string" }
+            }
+          }
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "url": { "type": "string" },
+              "type": { "type": "string" },
+              "category": { "type": "string", "enum": ["social", "medical", "identity"] },
+              "uploadedAt": { "type": "string", "format": "date-time" },
+              "issueDate": { "type": "string", "format": "date" },
+              "expiryDate": { "type": "string", "format": "date" }
+            }
+          }
+        }
+      },
+      "required": ["name", "relation", "familyId"]
+    },
+    "Assistance": {
+      "title": "Assistance",
+      "description": "Record of aid provided to a family.",
+      "type": "object",
+      "properties": {
+        "assistanceCode": { "type": "string" },
+        "deliveryCode": { "type": "string" },
+        "familyId": { "type": "string" },
+        "targetFamilyId": { "type": "string" },
+        "targetMemberId": { "type": "string" },
+        "amount": { "type": "number" },
+        "type": { "type": "string" },
+        "unit": { "type": "string" },
+        "distributionDate": { "type": "string", "format": "date" },
+        "deliveryMethod": { "type": "string", "enum": ["shipping", "branch"] },
+        "deliveryDestination": { "type": "string" },
+        "deliveryQuantity": { "type": "number" },
+        "isDelivered": { "type": "boolean" },
+        "deliveryDate": { "type": "string", "format": "date" },
+        "notes": { "type": "string" }
+      },
+      "required": ["familyId", "amount", "type", "distributionDate"]
+    },
+    "SystemService": {
+      "title": "System Service",
+      "description": "A service offered by the charity.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "category": { "type": "string" },
+        "defaultUnitCost": { "type": "number" },
+        "iconName": { "type": "string" }
+      },
+      "required": ["name"]
+    },
+    "Donor": {
+      "title": "Donor",
+      "description": "Represents a donor who provides funds or aid.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "type": { "type": "string", "enum": ["individual", "organization"] },
+        "totalDonated": { "type": "number" },
+        "lastDonationDate": { "type": "string", "format": "date" },
+        "registrationSource": { "type": "string", "enum": ["call_center", "campaign", "social_media", "website", "other"] }
+      },
+      "required": ["name"]
+    },
+    "Donation": {
+      "title": "Donation",
+      "description": "Record of a donation received.",
+      "type": "object",
+      "properties": {
+        "donorId": { "type": "string" },
+        "donorName": { "type": "string" },
+        "donorPhone": { "type": "string" },
+        "amount": { "type": "number" },
+        "currency": { "type": "string", "enum": ["EGP", "USD", "SAR"] },
+        "date": { "type": "string", "format": "date" },
+        "type": { "type": "string", "enum": ["cash", "kind", "other"] },
+        "targetType": { "type": "string", "enum": ["general", "family", "campaign"] },
+        "targetId": { "type": "string" },
+        "targetName": { "type": "string" },
+        "notes": { "type": "string" }
+      },
+      "required": ["donorId", "amount", "date", "type"]
+    },
+    "StoreItem": {
+      "title": "Store Item",
+      "description": "An item in the charity warehouse.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "quantity": { "type": "number" },
+        "unit": { "type": "string" },
+        "minQuantity": { "type": "number" },
+        "location": { "type": "string" },
+        "lastUpdated": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "quantity", "unit"]
+    },
+    "EmergencyCase": {
+      "title": "Emergency Case",
+      "description": "Represents a high-priority case requiring rapid response.",
+      "type": "object",
+      "properties": {
+        "caseCode": { "type": "string" },
+        "familyId": { "type": "string" },
+        "familyName": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "priority": { "type": "string", "enum": ["low", "medium", "high", "urgent"] },
+        "status": { "type": "string", "enum": ["open", "closed", "resolved"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["caseCode", "familyId", "title", "description", "priority", "status"]
+    },
+    "MedicalClaim": {
+      "title": "Medical Claim",
+      "description": "A claim for medical expense reimbursement or payment.",
+      "type": "object",
+      "properties": {
+        "claimCode": { "type": "string" },
+        "familyId": { "type": "string" },
+        "memberId": { "type": "string" },
+        "serviceId": { "type": "string" },
+        "serviceName": { "type": "string" },
+        "serviceCode": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "partially_paid", "paid", "rejected"] },
+        "amount": { "type": "number" },
+        "approvedAmount": { "type": "number" },
+        "date": { "type": "string", "format": "date" },
+        "providerName": { "type": "string" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["claimCode", "familyId", "serviceId", "status", "amount", "date", "providerName"]
+    },
+    "Visit": {
+      "title": "Visit",
+      "description": "Record of a field visit to a family case.",
+      "type": "object",
+      "properties": {
+        "visitCode": { "type": "string" },
+        "familyId": { "type": "string" },
+        "visitDate": { "type": "string", "format": "date" },
+        "type": { "type": "string", "enum": ["field", "office", "phone", "assessment"] },
+        "status": { "type": "string", "enum": ["completed", "scheduled", "canceled"] },
+        "findings": { "type": "string" },
+        "recommendations": { "type": "string" },
+        "visitorName": { "type": "string" }
+      },
+      "required": ["familyId", "visitDate", "status"]
+    },
+    "Campaign": {
+      "title": "Campaign",
+      "description": "Fundraising campaign for a specific cause.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "slug": { "type": "string" },
+        "description": { "type": "string" },
+        "goalAmount": { "type": "number" },
+        "collectedAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["active", "completed", "draft"] },
+        "imageUrl": { "type": "string" }
+      },
+      "required": ["title", "slug", "goalAmount", "status"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "System notification for goals or donations.",
+      "type": "object",
+      "properties": {
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["success", "info", "warning"] },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "read": { "type": "boolean" }
+      },
+      "required": ["message", "type", "timestamp", "read"]
+    },
+    "LookupItem": {
+      "title": "Lookup Item",
+      "description": "A lookup item for dropdowns like governorates, diseases, delivery locations, financial categories, etc.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["governorate", "neighborhood", "disease", "role", "assistance_type", "nationality", "delivery_location", "financial_category"] },
+        "parentId": { "type": "string" },
+        "subType": { "type": "string", "enum": ["income", "expense"] },
+        "address": { "type": "string" },
+        "contactPhone": { "type": "string" },
+        "locationUrl": { "type": "string" },
+        "serviceIds": { "type": "array", "items": { "type": "string" } },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "type"]
+    },
+    "HistorySnapshot": {
+      "title": "History Snapshot",
+      "description": "A snapshot of family data changes for tracking variables over time.",
+      "type": "object",
+      "properties": {
+        "timestamp": { "type": "string", "format": "date-time" },
+        "source": { "type": "string", "enum": ["visit", "technical_update", "manual"] },
+        "sourceId": { "type": "string" },
+        "category": { "type": "string", "enum": ["income", "housing", "social", "technical", "full"] },
+        "data": { "type": "object" },
+        "previousData": { "type": "object" },
+        "changeSummary": { "type": "string" }
+      },
+      "required": ["timestamp", "source", "category", "data"]
+    },
+    "AppUser": {
+      "title": "App User",
+      "description": "Internal system user (staff, admin, volunteer).",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "staff", "volunteer"] },
+        "departmentId": { "type": "string" },
+        "permissions": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "role", "isActive"]
+    },
+    "AppModule": {
+      "title": "App Module",
+      "description": "Customizable system module configuration.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "originalName": { "type": "string" },
+        "icon": { "type": "string" },
+        "order": { "type": "number" },
+        "isActive": { "type": "boolean" },
+        "path": { "type": "string" }
+      },
+      "required": ["name", "originalName", "order", "isActive", "path"]
+    },
+    "AssistanceType": {
+      "title": "Assistance Type",
+      "description": "Definition of an assistance type with unit and default price.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "unit": { "type": "string" },
+        "category": { "type": "string" },
+        "defaultPrice": { "type": "number" },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "unit", "category"]
+    },
+    "Department": {
+      "title": "Department",
+      "description": "Organizational department for users.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" }
+      },
+      "required": ["name"]
+    }
+  },
+  "firestore": {
+    "families": {
+      "schema": "Family",
+      "description": "Collection of family records."
+    },
+    "families/{familyId}/members": {
+      "schema": "FamilyMember",
+      "description": "Subcollection of family members."
+    },
+    "families/{familyId}/visits": {
+      "schema": "Visit",
+      "description": "Subcollection of visits for a specific family."
+    },
+    "families/{familyId}/history": {
+      "schema": "HistorySnapshot",
+      "description": "Subcollection of data history snapshots for a specific family."
+    },
+    "assistances": {
+      "schema": "Assistance",
+      "description": "Collection of aid records."
+    },
+    "donors": {
+      "schema": "Donor",
+      "description": "Collection of donors."
+    },
+    "donations": {
+      "schema": "Donation",
+      "description": "Collection of donations."
+    },
+    "campaigns": {
+      "schema": "Campaign",
+      "description": "Collection of fundraising campaigns."
+    },
+    "services": {
+      "schema": "SystemService",
+      "description": "Collection of system services."
+    },
+    "lookups": {
+      "schema": "LookupItem",
+      "description": "Collection of lookup items for the system."
+    },
+    "notifications": {
+      "schema": "Notification",
+      "description": "System notifications collection."
+    },
+    "store_items": {
+      "schema": "StoreItem",
+      "description": "Collection of items in the charity warehouse."
+    },
+    "emergency_cases": {
+      "schema": "EmergencyCase",
+      "description": "Collection of emergency cases."
+    },
+    "medical_claims": {
+      "schema": "MedicalClaim",
+      "description": "Collection of medical claims."
+    },
+    "aid_requests": {
+      "schema": { "type": "object", "properties": { "status": { "type": "string" } } },
+      "description": "Top-level aid requests for dashboard tracking."
+    },
+    "users": {
+        "schema": "AppUser",
+        "description": "Internal system users."
+    },
+    "modules": {
+        "schema": "AppModule",
+        "description": "System modules configuration."
+    },
+    "departments": {
+        "schema": "Department",
+        "description": "System departments."
+    },
+    "assistance_types": {
+        "schema": "AssistanceType",
+        "description": "Definitions of assistance types."
+    }
+  }
+}
